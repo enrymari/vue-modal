@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { closeModal } from '../actions'
-import { lastModal } from '../data'
 import { $emit, $off, $on } from '../event'
 import { state as stateOptions } from '../options'
 import type { ClosedEventData, ModalItem, OpenModalOptions } from '../types'
@@ -12,7 +11,9 @@ import isEsc from '../utils/isEsc'
 const props = withDefaults(
   defineProps<{
     group?: OpenModalOptions['group']
-    item: ModalItem
+    modal: ModalItem
+    lastModal: ModalItem
+    maxModalId: number
   }>(),
   {
     group: 'default'
@@ -21,15 +22,15 @@ const props = withDefaults(
 
 const show = ref(false)
 
-const hide = computed(() => props.item.id !== lastModal.value.id)
+const hide = computed(() => props.modal.id !== props.lastModal.id)
 
 const transitionTime = computed(() => {
   return stateOptions.animationType !== 'none' ? stateOptions.transitionTime || 0 : 0
 })
 const getStyle = computed(() => {
   return {
-    padding: props.item?.options?.modalStyle?.padding ?? stateOptions.modalStyle?.padding,
-    'z-index': props.item?.options?.modalStyle?.['z-index'] ?? stateOptions.modalStyle?.['z-index'],
+    padding: props.modal?.options?.modalStyle?.padding ?? stateOptions.modalStyle?.padding,
+    'z-index': props.modal?.options?.modalStyle?.['z-index'] ?? stateOptions.modalStyle?.['z-index'],
     transition: `opacity ${transitionTime.value}ms ease, visibility ${transitionTime.value}ms ease, transform ${transitionTime.value}ms ease`
   }
 })
@@ -39,16 +40,16 @@ const getClasses = computed(() => {
       'vue-modal--active': show.value,
       'vue-modal--hide': hide.value
     },
-    `vue-modal--${props.item?.options?.modalStyle?.align ?? stateOptions.modalStyle?.align}`,
+    `vue-modal--${props.modal?.options?.modalStyle?.align ?? stateOptions.modalStyle?.align}`,
     `vue-modal--${stateOptions.animationType}`
   ]
 })
 
 function onClose(data: any) {
-  if (lastModal.value.id === props.item.id) {
+  if (props.maxModalId === props.modal.id) {
     show.value = false
     setTimeout($emit, transitionTime.value, Events.Closed, {
-      id: props.item.id,
+      id: props.modal.id,
       success: data.success,
       data: data.data
     } as ClosedEventData)
@@ -56,7 +57,7 @@ function onClose(data: any) {
 }
 
 function onEsc(e: Event) {
-  if (isEsc(e) && lastModal.value.id === props.item.id) {
+  if (isEsc(e) && props.maxModalId === props.modal.id) {
     closeModal()
   }
 }
@@ -66,7 +67,7 @@ onMounted(() => {
     () => {
       show.value = true
     },
-    props.item.id > 0 ? transitionTime.value : 0
+    props.modal.id > 0 ? transitionTime.value : 0
   )
   $on(Events.Close, onClose)
   document.addEventListener('keydown', onEsc)

@@ -8,8 +8,6 @@ export const state = reactive<{
   modals: []
 })
 
-export const lastModal = computed(() => state.modals[state.modals.length - 1])
-
 export const modals = computed(() => state.modals)
 export const isOpened = computed(() => state.modals.length > 0)
 

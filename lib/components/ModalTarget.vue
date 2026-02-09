@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { useLock } from '../composables/useLock'
-import { lastModal, state as stateData } from '../data'
+import { state as stateData } from '../data'
 import { $off, $on } from '../event'
 import { state as stateOptions } from '../options'
 import type { CloseEventData, OpenModalOptions } from '../types'
@@ -32,13 +32,10 @@ const overlayStyle = computed(() => {
 
 const hide = ref(false)
 
-const currentModals = computed(() => {
-  return stateData.modals.filter((item) => item.options.group === props.group)
-})
-
-const activeOverlay = computed(() => {
-  return currentModals.value.length && !hide.value && lastModal.value.options.group === props.group
-})
+const maxModalId = computed(() => stateData.modals[stateData.modals.length - 1]?.id ?? -1)
+const currentModals = computed(() => stateData.modals.filter((item) => item.options.group === props.group))
+const lastCurrentModal = computed(() => currentModals.value[currentModals.value.length - 1] ?? null)
+const isOverlayActive = computed(() => currentModals.value.length && !hide.value)
 
 function onClose({ forceCloseAll }: CloseEventData) {
   if ((currentModals.value.length === 1 && forceCloseAll !== false) || forceCloseAll) {
@@ -72,12 +69,19 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="[`vue-modals-${props.group}-group`]" class="vue-modals">
-    <BaseModal v-for="item in currentModals" :item="item" :key="`${props.group}-${item.id}`">
-      <template #default="{ show, hide }">
+    <BaseModal
+      v-for="item in currentModals"
+      :modal="item"
+      :group="props.group"
+      :key="`${props.group}-${item.id}`"
+      :last-modal="lastCurrentModal"
+      :max-modal-id="maxModalId"
+    >
+      <template #default="{ show: showModal, hide: hideModal }">
         <component
           :is="item.component"
           :modal="item"
-          :data-state="hide || (!hide && !show) ? 'closed' : show ? 'open' : undefined"
+          :data-state="hideModal || (!hideModal && !showModal) ? 'closed' : showModal ? 'open' : undefined"
           v-bind="item.props"
         />
       </template>
@@ -86,7 +90,7 @@ onBeforeUnmount(() => {
     <div
       v-if="!withoutOverlay"
       :style="overlayStyle"
-      :class="{ active: activeOverlay }"
+      :class="{ active: isOverlayActive }"
       class="vue-modals-overlay"
     ></div>
   </div>
