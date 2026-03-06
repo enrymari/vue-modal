@@ -1,4 +1,4 @@
-name: 🚀 publish to npm
+name: 🚀 deploy
 
 on:
   release:
@@ -27,7 +27,3 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: build-lib
-      - name: 🚀 Publish
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
