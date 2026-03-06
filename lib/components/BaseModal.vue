@@ -57,7 +57,7 @@ function onClose(data: any) {
 }
 
 function onEsc(e: Event) {
-  if (isEsc(e) && props.maxModalId === props.modal.id) {
+  if (!props.modal.options.noesc && isEsc(e) && props.maxModalId === props.modal.id) {
     closeModal()
   }
 }
