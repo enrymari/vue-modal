@@ -36,7 +36,6 @@ const props = defineProps({
 
 <style lang="scss" scoped>
 .vue-modal-content {
-  background: #fff;
   border-radius: 0.5rem;
   font-family: inherit;
 
@@ -87,7 +86,7 @@ const props = defineProps({
   opacity: 0.5;
   width: 2rem;
   height: 2rem;
-  background: transparent
+  background: rgb(59 130 246 / var(--tw-bg-opacity))
     url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e")
     center/1em auto no-repeat;
   border: none;
