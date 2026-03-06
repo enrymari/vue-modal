@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@kyvg/vue3-notification": "^2.9.1",
+    "@microsoft/api-extractor": "^7.57.6".
     "@rushstack/eslint-patch": "^1.2.0",
     "@tsconfig/node18": "^2.0.1",
     "@types/node": "^18.16.8",
