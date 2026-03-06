@@ -29,6 +29,7 @@ export type Options = {
 export type OpenModalOptions = {
   group?: 'default' | string
   force?: boolean
+  noesc?: boolean
   modalStyle?: ModalStyle
 }
 
